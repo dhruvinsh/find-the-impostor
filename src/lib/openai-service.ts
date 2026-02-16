@@ -50,7 +50,6 @@ export class OpenAIService {
           response_format: {
             type: "json_object",
           },
-          max_tokens: 1500,
           temperature: 0.7,
           top_p: 0.9,
           frequency_penalty: 0.1, // Encourage variety
