@@ -1,0 +1,12 @@
+services:
+  find-the-impostor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: find-the-impostor
+    container_name: find-the-impostor
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

@@ -178,19 +178,14 @@ Always respond with valid JSON matching the requested schema. No additional text
   }
 }
 
-if (
-  !process.env.OPENAI_API_KEY ||
-  !process.env.OPENAI_API_BASE ||
-  !process.env.LLM_MODEL
-) {
-  throw new Error(
-    "Missing required environment variables: OPENAI_API_KEY and OPENAI_API_BASE and LLM_MODEL",
-  );
-}
-
-export const openAIService = new OpenAIService({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseUrl: process.env.OPENAI_API_BASE,
-  model: process.env.LLM_MODEL,
-  fallbackModel: process.env.LLM_FALLBACK_MODEL,
-});
+export const openAIService =
+  process.env.OPENAI_API_KEY &&
+  process.env.OPENAI_API_BASE &&
+  process.env.LLM_MODEL
+    ? new OpenAIService({
+        apiKey: process.env.OPENAI_API_KEY,
+        baseUrl: process.env.OPENAI_API_BASE,
+        model: process.env.LLM_MODEL,
+        fallbackModel: process.env.LLM_FALLBACK_MODEL,
+      })
+    : null;

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Locale } from "@/src/config/language";
+import { FALLBACK_WORDS_WITH_HINTS } from "@/src/data/fallbackwords";
 import { openAIService } from "@/src/lib/openai-service";
 import { PromptEngine } from "@/src/lib/prompts";
 import { NextRequest, NextResponse } from "next/server";
@@ -93,6 +94,7 @@ export async function POST(request: NextRequest) {
     //! NOTE: Implement Redis or similar for distributed rate limiting
     for (const [tierName, tier] of Object.entries(RATE_LIMIT_TIERS)) {
       if (
+        openAIService &&
         !openAIService.checkRateLimit(
           `${clientIP}:${tierName}`,
           tier.windowMs,
@@ -128,6 +130,44 @@ export async function POST(request: NextRequest) {
     }
 
     const { category, language, count, difficulty } = validation.data!;
+
+    if (!openAIService) {
+      const langFallback =
+        FALLBACK_WORDS_WITH_HINTS[language as keyof typeof FALLBACK_WORDS_WITH_HINTS] ??
+        FALLBACK_WORDS_WITH_HINTS["en"];
+      const categoryFallback =
+        langFallback[category as keyof typeof langFallback] ??
+        Object.values(langFallback)[0];
+      const words = [...categoryFallback]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, count);
+
+      console.log(
+        `OpenAI service not configured — serving fallback words for "${category}" in ${language}`,
+      );
+
+      return NextResponse.json(
+        {
+          wordsWithHints: words,
+          metadata: {
+            category,
+            language,
+            difficulty,
+            generatedAt: new Date().toISOString(),
+            responseTime: Date.now() - startTime,
+            requestedCount: count,
+            actualCount: words.length,
+            source: "fallback",
+          },
+        },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
 
     const prompt = PromptEngine.createPrompt({
       category,
@@ -236,12 +276,13 @@ export async function POST(request: NextRequest) {
 
 // Health check endpoint
 export async function GET() {
-  const stats = openAIService.getUsageStats();
+  const stats = openAIService ? openAIService.getUsageStats() : null;
 
   return NextResponse.json({
     status: "healthy",
     service: "word-generation",
     timestamp: new Date().toISOString(),
-    stats,
+    aiEnabled: openAIService !== null,
+    ...(stats && { stats }),
   });
 }
