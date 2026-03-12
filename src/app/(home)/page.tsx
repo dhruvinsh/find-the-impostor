@@ -33,10 +33,6 @@ export default function Home() {
           </Link>
         </Button>
       </div>
-
-      <div className="pb-3 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Mark Knotzer
-      </div>
     </div>
   );
 }
