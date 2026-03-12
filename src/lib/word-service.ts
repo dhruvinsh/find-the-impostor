@@ -67,15 +67,26 @@ export async function getRandomWordWithHints(
     console.error("Error loading words:", error);
   }
 
-  const categoryKey =
-    category.toLowerCase() as keyof (typeof FALLBACK_WORDS_WITH_HINTS)[typeof language];
-  const fallbackWords = FALLBACK_WORDS_WITH_HINTS[language]?.[categoryKey];
+  const langFallback =
+    FALLBACK_WORDS_WITH_HINTS[language] ?? FALLBACK_WORDS_WITH_HINTS["en"];
+  const categoryKey = category.toLowerCase() as keyof typeof langFallback;
+  const categoryWords = langFallback[categoryKey];
 
-  if (fallbackWords && fallbackWords.length > 0) {
-    return fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+  // Collect candidate words: prefer the matching category, otherwise pool all categories
+  const candidates = categoryWords
+    ? [...categoryWords]
+    : Object.values(langFallback).flat();
+
+  if (candidates.length === 0) {
+    throw new Error(
+      `No words available for category "${category}" in language "${language}"`,
+    );
   }
 
-  throw new Error(
-    `No words available for category "${category}" in language "${language}"`,
-  );
+  // Fisher-Yates shuffle for unbiased random selection
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+  }
+  return candidates[0];
 }

@@ -133,8 +133,9 @@ export async function POST(request: NextRequest) {
 
     if (!openAIService) {
       const langFallback =
-        FALLBACK_WORDS_WITH_HINTS[language as keyof typeof FALLBACK_WORDS_WITH_HINTS] ??
-        FALLBACK_WORDS_WITH_HINTS["en"];
+        FALLBACK_WORDS_WITH_HINTS[
+          language as keyof typeof FALLBACK_WORDS_WITH_HINTS
+        ] ?? FALLBACK_WORDS_WITH_HINTS["en"];
       const categoryFallback =
         langFallback[category as keyof typeof langFallback] ??
         Object.values(langFallback)[0];
@@ -162,7 +163,7 @@ export async function POST(request: NextRequest) {
         },
         {
           headers: {
-            "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+            "Cache-Control": "no-store",
             "Content-Type": "application/json",
           },
         },
