@@ -45,7 +45,7 @@ export default function MobilePlayerManagement({
   }, [localPlayers, setPlayerCount, setPlayerName, t]);
 
   const addPlayer = () => {
-    if (newPlayerName.trim() && localPlayers.length < 10) {
+    if (newPlayerName.trim() && localPlayers.length < 20) {
       setLocalPlayers([...localPlayers, newPlayerName.trim()]);
       setNewPlayerName("");
       setShowAddInput(false);
@@ -212,7 +212,7 @@ export default function MobilePlayerManagement({
                           size="icon"
                           onClick={addPlayer}
                           disabled={
-                            !newPlayerName.trim() || localPlayers.length >= 10
+                            !newPlayerName.trim() || localPlayers.length >= 20
                           }
                           className="size-9 rounded-xl text-green-400 hover:bg-green-500/10"
                         >
@@ -237,7 +237,7 @@ export default function MobilePlayerManagement({
             ) : (
               <Button
                 onClick={() => setShowAddInput(true)}
-                disabled={localPlayers.length >= 10}
+                disabled={localPlayers.length >= 20}
                 className="h-14 w-full bg-white text-lg font-semibold text-black hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50"
               >
                 <Plus className="mr-3 h-5 w-5" />
