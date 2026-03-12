@@ -26,7 +26,10 @@ interface GameStore {
   removeCustomCategory: (category: string) => void;
   toggleHints: () => void;
 
-  startGame: (t: TranslationFunction, language: Locale) => Promise<void>;
+  startGame: (
+    t: TranslationFunction,
+    language: Locale,
+  ) => Promise<{ usedFallback: boolean }>;
   nextRevealPlayer: () => void;
   startDiscussion: () => void;
   endGame: () => void;
@@ -178,7 +181,7 @@ export const useGameStore = create<GameStore>()(
 
         if (gameState.selectedCategories.length === 0) {
           console.error("No categories selected");
-          return;
+          return { usedFallback: false };
         }
 
         const players: Player[] = Array.from(
@@ -203,7 +206,7 @@ export const useGameStore = create<GameStore>()(
           gameState.selectedCategories[
             Math.floor(Math.random() * gameState.selectedCategories.length)
           ];
-        const wordWithHints = await getRandomWordWithHints(
+        const { wordWithHints, usedFallback } = await getRandomWordWithHints(
           randomCategory,
           language,
           gameState.difficulty,
@@ -226,6 +229,8 @@ export const useGameStore = create<GameStore>()(
             currentRevealIndex: 0,
           },
         }));
+
+        return { usedFallback };
       },
 
       nextRevealPlayer: () => {

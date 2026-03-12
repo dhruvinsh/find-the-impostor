@@ -7,7 +7,7 @@ export async function getRandomWordWithHints(
   category: string,
   language: Locale,
   difficulty: Difficulty = "medium",
-): Promise<WordWithHints> {
+): Promise<{ wordWithHints: WordWithHints; usedFallback: boolean }> {
   try {
     const cached = await db.wordSets
       .where(["category", "language"])
@@ -33,7 +33,7 @@ export async function getRandomWordWithHints(
         await db.wordSets.delete(cached.id);
       }
 
-      return selectedWord;
+      return { wordWithHints: selectedWord, usedFallback: false };
     }
     const response = await fetch("/api/generate-words", {
       method: "POST",
@@ -61,7 +61,7 @@ export async function getRandomWordWithHints(
         });
       }
 
-      return selectedWord;
+      return { wordWithHints: selectedWord, usedFallback: false };
     }
   } catch (error) {
     console.error("Error loading words:", error);
@@ -88,5 +88,5 @@ export async function getRandomWordWithHints(
     const j = Math.floor(Math.random() * (i + 1));
     [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
   }
-  return candidates[0];
+  return { wordWithHints: candidates[0], usedFallback: true };
 }

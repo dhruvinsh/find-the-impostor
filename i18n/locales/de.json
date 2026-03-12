@@ -38,7 +38,8 @@
     "difficulty": "Schwierigkeitsgrad",
     "easy": "Einfach",
     "medium": "Mittel",
-    "hard": "Schwer"
+    "hard": "Schwer",
+    "fallbackWordsNotice": "Wortgenerator nicht erreichbar – es wird stattdessen die eingebaute Wortliste verwendet."
   },
   "WordRevealPhase": {
     "chooseYourCard": "Wähle deine Karte",

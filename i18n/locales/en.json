@@ -38,7 +38,8 @@
     "difficulty": "Difficulty",
     "easy": "Easy",
     "medium": "Medium",
-    "hard": "Hard"
+    "hard": "Hard",
+    "fallbackWordsNotice": "Couldn't reach the word generator — using built-in word list instead."
   },
   "WordRevealPhase": {
     "chooseYourCard": "Choose Your Card",

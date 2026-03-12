@@ -75,7 +75,10 @@ export default function SetupPhase() {
       if (isStarting) return;
       if (gameState.gameStarted) return;
       setIsStarting(true);
-      await startGame(t, locale);
+      const { usedFallback } = await startGame(t, locale);
+      if (usedFallback) {
+        toast.warning(t("fallbackWordsNotice"));
+      }
     } catch (error) {
       console.error(error);
       toast.error(tError("somethingWentWrong"));
