@@ -4,7 +4,7 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { GameState, TranslationFunction } from "@/src/types/game";
-import { ArrowLeft, Users, Plus, X, Edit3, Check } from "lucide-react";
+import { ArrowLeft, Users, Plus, Minus, X, Edit3, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface MobilePlayerManagementProps {
@@ -77,6 +77,21 @@ export default function MobilePlayerManagement({
     setEditingName("");
   };
 
+  const increasePlayerCount = () => {
+    if (localPlayers.length < 20) {
+      setLocalPlayers([
+        ...localPlayers,
+        `${t("player")} ${localPlayers.length + 1}`,
+      ]);
+    }
+  };
+
+  const decreasePlayerCount = () => {
+    if (localPlayers.length > 3) {
+      setLocalPlayers(localPlayers.slice(0, -1));
+    }
+  };
+
   return (
     <div className="min-h-dvh">
       <Button
@@ -95,14 +110,37 @@ export default function MobilePlayerManagement({
         <div className="space-y-6">
           <Card className="rounded-3xl p-0">
             <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-                <div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
                   <h3 className="text-lg font-semibold text-white">
-                    {localPlayers.length} {t("players")}
+                    {t("players")}
                   </h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={decreasePlayerCount}
+                    disabled={localPlayers.length <= 3}
+                    className="size-10 rounded-xl text-white hover:bg-white/10 disabled:opacity-30"
+                  >
+                    <Minus className="size-5" />
+                  </Button>
+                  <span className="w-6 text-center text-xl font-bold text-white">
+                    {localPlayers.length}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={increasePlayerCount}
+                    disabled={localPlayers.length >= 20}
+                    className="size-10 rounded-xl text-white hover:bg-white/10 disabled:opacity-30"
+                  >
+                    <Plus className="size-5" />
+                  </Button>
                 </div>
               </div>
             </CardContent>
