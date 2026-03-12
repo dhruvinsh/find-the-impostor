@@ -38,4 +38,5 @@ export interface GameState {
   showHintsToImpostors: boolean;
   currentRevealIndex: number;
   gameStarted: boolean;
+  usedFallback?: boolean;
 }

@@ -56,7 +56,8 @@
     "yourHint": "Dein Hinweis:",
     "yourWordIs": "Dein Wort ist:",
     "flipCard": "Karte umdrehen",
-    "nextPlayer": "Nächster Spieler"
+    "nextPlayer": "Nächster Spieler",
+    "usingBuiltInWords": "Eingebaute Wortliste wird verwendet"
   },
   "DiscussionPhase": {
     "sayYourWords": "Sagt eure Wörter",

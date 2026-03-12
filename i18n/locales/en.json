@@ -56,7 +56,8 @@
     "yourHint": "Your hint:",
     "yourWordIs": "Your word is:",
     "flipCard": "Flip Card",
-    "nextPlayer": "Next Player"
+    "nextPlayer": "Next Player",
+    "usingBuiltInWords": "Using built-in word list"
   },
   "DiscussionPhase": {
     "sayYourWords": "Say Your Words",

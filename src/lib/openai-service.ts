@@ -192,14 +192,11 @@ Always respond with valid JSON matching the requested schema. No additional text
   }
 }
 
-export const openAIService =
-  process.env.OPENAI_API_KEY &&
-  process.env.OPENAI_API_BASE &&
-  process.env.LLM_MODEL
-    ? new OpenAIService({
-        apiKey: process.env.OPENAI_API_KEY,
-        baseUrl: process.env.OPENAI_API_BASE,
-        model: process.env.LLM_MODEL,
-        fallbackModel: process.env.LLM_FALLBACK_MODEL,
-      })
-    : null;
+export const openAIService = process.env.OPENAI_API_KEY
+  ? new OpenAIService({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseUrl: process.env.OPENAI_API_BASE || "https://api.openai.com/v1",
+      model: process.env.LLM_MODEL || "gpt-5-mini",
+      fallbackModel: process.env.LLM_FALLBACK_MODEL,
+    })
+  : null;

@@ -59,7 +59,10 @@ export default function MobileSetupPhase() {
       if (isStarting) return;
       if (gameState.gameStarted) return;
       setIsStarting(true);
-      await startGame(t, locale);
+      const { usedFallback } = await startGame(t, locale);
+      if (usedFallback) {
+        toast.warning(t("fallbackWordsNotice"), { duration: 8000 });
+      }
     } catch (error) {
       console.error(error);
       toast.error(tError("somethingWentWrong"));

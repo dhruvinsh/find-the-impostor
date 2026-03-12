@@ -77,7 +77,7 @@ export default function SetupPhase() {
       setIsStarting(true);
       const { usedFallback } = await startGame(t, locale);
       if (usedFallback) {
-        toast.warning(t("fallbackWordsNotice"));
+        toast.warning(t("fallbackWordsNotice"), { duration: 8000 });
       }
     } catch (error) {
       console.error(error);

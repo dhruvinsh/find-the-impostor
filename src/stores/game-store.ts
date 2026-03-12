@@ -227,6 +227,7 @@ export const useGameStore = create<GameStore>()(
             currentHints: wordWithHints.hints,
             currentCategory: randomCategory,
             currentRevealIndex: 0,
+            usedFallback,
           },
         }));
 
@@ -268,6 +269,7 @@ export const useGameStore = create<GameStore>()(
             currentWord: "",
             currentHints: [],
             currentCategory: "",
+            usedFallback: false,
           },
         }));
       },

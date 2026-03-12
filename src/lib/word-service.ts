@@ -43,6 +43,7 @@ export async function getRandomWordWithHints(
 
     if (response.ok) {
       const data = await response.json();
+      const usedFallback = data.metadata?.source === "fallback";
       const randomIndex = Math.floor(
         Math.random() * data.wordsWithHints.length,
       );
@@ -50,7 +51,7 @@ export async function getRandomWordWithHints(
       const remainingWords: WordWithHints[] = data.wordsWithHints.filter(
         (_: WordWithHints, index: number) => index !== randomIndex,
       );
-      if (remainingWords.length > 0) {
+      if (remainingWords.length > 0 && !usedFallback) {
         await db.wordSets.add({
           id: `${category.toLowerCase()}-${language}-${Date.now()}`,
           category: category.toLowerCase(),
@@ -61,7 +62,7 @@ export async function getRandomWordWithHints(
         });
       }
 
-      return { wordWithHints: selectedWord, usedFallback: false };
+      return { wordWithHints: selectedWord, usedFallback };
     }
   } catch (error) {
     console.error("Error loading words:", error);

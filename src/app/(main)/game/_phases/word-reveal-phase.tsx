@@ -97,6 +97,11 @@ export default function WordRevealPhase() {
               {revealedPlayers.length} {t("of")} {gameState.players.length}{" "}
               {t("playersRevealed")}
             </Badge>
+            {gameState.usedFallback && (
+              <p className="text-xs text-amber-400/70">
+                {t("usingBuiltInWords")}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
