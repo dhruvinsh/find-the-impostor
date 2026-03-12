@@ -5,7 +5,12 @@ import { Card, CardContent } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { GameState, TranslationFunction } from "@/src/types/game";
 import { ArrowLeft, Users, Plus, Minus, X, Edit3, Check } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+interface LocalPlayer {
+  id: number;
+  name: string;
+}
 
 interface MobilePlayerManagementProps {
   onBack: () => void;
@@ -24,71 +29,90 @@ export default function MobilePlayerManagement({
   setPlayerName,
   t,
 }: MobilePlayerManagementProps) {
-  const [localPlayers, setLocalPlayers] = useState<string[]>(() => {
-    const players = [];
-    for (let i = 0; i < gameState.totalPlayers; i++) {
-      players.push(playerNames[i] || `${t("player")} ${i + 1}`);
-    }
-    return players;
-  });
+  const [localPlayers, setLocalPlayers] = useState<LocalPlayer[]>(() =>
+    Array.from({ length: gameState.totalPlayers }, (_, i) => ({
+      id: i + 1,
+      name: playerNames[i] || `${t("player")} ${i + 1}`,
+    })),
+  );
+  const nextIdRef = useRef(gameState.totalPlayers + 1);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState("");
   const [showAddInput, setShowAddInput] = useState(false);
 
   // Auto-save changes
   useEffect(() => {
     setPlayerCount(localPlayers.length, t);
-    localPlayers.forEach((name, index) => {
-      setPlayerName(index, name);
+    localPlayers.forEach((player, index) => {
+      setPlayerName(index, player.name);
     });
   }, [localPlayers, setPlayerCount, setPlayerName, t]);
 
   const addPlayer = () => {
     if (newPlayerName.trim() && localPlayers.length < 20) {
-      setLocalPlayers([...localPlayers, newPlayerName.trim()]);
+      setLocalPlayers([
+        ...localPlayers,
+        { id: nextIdRef.current++, name: newPlayerName.trim() },
+      ]);
       setNewPlayerName("");
       setShowAddInput(false);
     }
   };
 
-  const removePlayer = (index: number) => {
+  const removePlayer = (id: number) => {
+    const index = localPlayers.findIndex(p => p.id === id);
     if (index < 3) return;
-    setLocalPlayers(localPlayers.filter((_, i) => i !== index));
+    if (editingId === id) {
+      setEditingId(null);
+      setEditingName("");
+    }
+    setLocalPlayers(prev => prev.filter(p => p.id !== id));
   };
 
-  const startEditing = (index: number) => {
-    setEditingIndex(index);
-    setEditingName(localPlayers[index]);
+  const startEditing = (id: number) => {
+    const player = localPlayers.find(p => p.id === id);
+    if (!player) return;
+    setEditingId(id);
+    setEditingName(player.name);
   };
 
   const saveEdit = () => {
-    if (editingName.trim() && editingIndex !== null) {
-      const updatedPlayers = [...localPlayers];
-      updatedPlayers[editingIndex] = editingName.trim();
-      setLocalPlayers(updatedPlayers);
+    if (editingName.trim() && editingId !== null) {
+      setLocalPlayers(prev =>
+        prev.map(p =>
+          p.id === editingId ? { ...p, name: editingName.trim() } : p,
+        ),
+      );
     }
-    setEditingIndex(null);
+    setEditingId(null);
     setEditingName("");
   };
 
   const cancelEdit = () => {
-    setEditingIndex(null);
+    setEditingId(null);
     setEditingName("");
   };
 
   const increasePlayerCount = () => {
     if (localPlayers.length < 20) {
-      setLocalPlayers([
-        ...localPlayers,
-        `${t("player")} ${localPlayers.length + 1}`,
+      setLocalPlayers(prev => [
+        ...prev,
+        { id: nextIdRef.current++, name: `${t("player")} ${prev.length + 1}` },
       ]);
     }
   };
 
   const decreasePlayerCount = () => {
     if (localPlayers.length > 3) {
-      setLocalPlayers(localPlayers.slice(0, -1));
+      setLocalPlayers(prev => {
+        const removed = prev[prev.length - 1];
+        if (editingId === removed.id) {
+          setEditingId(null);
+          setEditingName("");
+        }
+        return prev.slice(0, -1);
+      });
     }
   };
 
@@ -148,10 +172,10 @@ export default function MobilePlayerManagement({
 
           <div className="space-y-3">
             {localPlayers.map((player, index) => (
-              <div key={index} className="w-full">
+              <div key={player.id} className="w-full">
                 <Card className="rounded-3xl p-0">
                   <CardContent className="p-0">
-                    {editingIndex === index ? (
+                    {editingId === player.id ? (
                       <div className="m-4 flex items-center gap-3">
                         <Input
                           value={editingName}
@@ -188,13 +212,13 @@ export default function MobilePlayerManagement({
                     ) : (
                       <div
                         className="flex items-center justify-between px-4 py-5"
-                        onClick={() => startEditing(index)}
+                        onClick={() => startEditing(player.id)}
                       >
                         <div className="flex items-center gap-3">
                           <div className="h-2 w-2 rounded-full bg-blue-400"></div>
 
                           <span className="font-medium text-white">
-                            {player}
+                            {player.name}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-blue-400">
@@ -209,7 +233,10 @@ export default function MobilePlayerManagement({
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => removePlayer(index)}
+                              onClick={e => {
+                                e.stopPropagation();
+                                removePlayer(player.id);
+                              }}
                               className="h-8 w-8 rounded-lg text-red-400 hover:bg-red-500/10"
                             >
                               <X className="size-4" />
